@@ -1,0 +1,2 @@
+Endpoint: POST /auth/login
+Request Body: {"email": "test-data@yandex.ru", "password": "password"}

@@ -70,42 +70,6 @@ public class CreateOrderTests {
         }
     }
 
-    @Step("Logout user")
-    private static void logoutUser() {
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .body("{\"token\": \"" + refreshToken + "\"}")
-                .when()
-                .post("/auth/logout");
-
-        System.out.println("Logout response: " + response.getBody().asString());
-
-        if (response.statusCode() == 200) {
-            System.out.println("Successfully logged out.");
-        } else {
-            throw new RuntimeException("Logout failed: " + response.getBody().asString());
-        }
-    }
-
-    @Step("Refresh access token")
-    private static void refreshAccessToken() {
-        String requestBody = String.format("{\"email\": \"%s\", \"password\": \"%s\"}", TEST_EMAIL, TEST_PASSWORD);
-
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .body(requestBody)
-                .when()
-                .post("/auth/token");
-
-        System.out.println("Refresh token response: " + response.getBody().asString());
-
-        if (response.statusCode() == 200) {
-            accessToken = response.jsonPath().getString("accessToken").replace("Bearer ", "").trim();
-            System.out.println("New Access Token: " + accessToken);
-        } else {
-            throw new RuntimeException("Failed to refresh token: " + response.getBody().asString());
-        }
-    }
 
     @Test
     @Description("Create order with valid authorization")

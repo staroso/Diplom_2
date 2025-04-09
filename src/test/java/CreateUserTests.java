@@ -1,6 +1,7 @@
 import io.qameta.allure.Description;
 import io.qameta.allure.Step;
 import io.restassured.http.ContentType;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static io.restassured.RestAssured.*;
@@ -11,6 +12,8 @@ public class CreateUserTests {
 
     private static String existingUserEmail = "test-data@yandex.ru";
     private static String existingUserPassword = "password";
+    private static String accessToken;
+
 
     @BeforeClass
     @Step("Setup the API base URI and create a test user")
@@ -29,6 +32,16 @@ public class CreateUserTests {
                 .body(requestBody)
                 .when()
                 .post("/auth/register");
+    }
+
+    @Step("Delete test user")
+    private static void deleteTestUser(String token) {
+        given()
+                .header("Authorization", token)
+                .when()
+                .delete("/auth/user")
+                .then()
+                .statusCode(202);
     }
 
     @Test
@@ -92,6 +105,13 @@ public class CreateUserTests {
                 .statusCode(403)
                 .body("success", equalTo(false))
                 .body("message", equalTo("Email, password and name are required fields"));
+    }
+
+    @AfterClass
+    public static void cleanup() {
+        if (accessToken != null) {
+            deleteTestUser(accessToken);
+        }
     }
 
 

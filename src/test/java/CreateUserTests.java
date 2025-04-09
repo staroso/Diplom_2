@@ -16,11 +16,9 @@ public class CreateUserTests {
 
 
     @BeforeClass
-    @Step("Setup the API base URI and create a test user")
     public static void setup() {
         baseURI = "https://stellarburgers.nomoreparties.site/api";
 
-        // Проверяем, существует ли пользователь, и создаем его, если нужно
         String requestBody = "{\n" +
                 "\"email\": \"" + existingUserEmail + "\",\n" +
                 "\"password\": \"" + existingUserPassword + "\",\n" +
@@ -32,6 +30,27 @@ public class CreateUserTests {
                 .body(requestBody)
                 .when()
                 .post("/auth/register");
+
+        // Получаем токен после регистрации
+        fetchAccessToken();
+    }
+    @Step("Получение accessToken для удаления тестового пользователя")
+    private static void fetchAccessToken() {
+        String loginRequestBody = "{\n" +
+                "\"email\": \"" + existingUserEmail + "\",\n" +
+                "\"password\": \"" + existingUserPassword + "\"\n" +
+                "}";
+
+        accessToken = given()
+                .contentType(ContentType.JSON)
+                .body(loginRequestBody)
+                .when()
+                .post("/auth/login")
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getString("accessToken");
     }
 
     @Step("Delete test user")
